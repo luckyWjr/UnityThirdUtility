@@ -232,6 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Character\AstarAI.cs" />
+    <Compile Include="Assets\Scripts\SingleClass.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\changelog.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Core\AI\AIPath.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Core\AI\NavmeshController.cs" />
