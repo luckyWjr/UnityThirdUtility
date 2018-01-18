@@ -297,6 +297,7 @@
     <Compile Include="Assets\Editor\AssetBundle\Manager\NotBuildAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Manager\TextAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Uploader.cs" />
+    <Compile Include="Assets\Editor\UnityBuildHandle.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AnimationLinkEditor.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AstarPathEditor.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AstarUpdateChecker.cs" />
