@@ -232,8 +232,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Character\AstarAI.cs" />
+    <Compile Include="Assets\Scripts\Manager\CallbackManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\ListenerManager.cs" />
     <Compile Include="Assets\Scripts\SingleClass.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
+    <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\ImageAssetItem.cs" />
+    <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\NormalAssetItem.cs" />
+    <Compile Include="Assets\Scripts\Utilities\AssetBundle\AssetBundleUtility.cs" />
     <Compile Include="Assets\Scripts\Utilities\WebUtility.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\changelog.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Core\AI\AIPath.cs" />
@@ -359,6 +364,7 @@
     <Compile Include="Assets\ThirdUtilities\SimpleJson\SimpleJSONUnity.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\Particle Add 1.shader" />
     <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\EditorAssets\Materials\Navmesh2.shader" />
     <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\Example8_PathTypes\SquareShader.shader" />
     <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\Materials\DiffuseAlwaysVisible.shader" />

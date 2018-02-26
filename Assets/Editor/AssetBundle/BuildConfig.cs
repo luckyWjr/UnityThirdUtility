@@ -15,7 +15,7 @@ namespace AssetBundle {
         public static string clothesFolder = "Assets/_Temp";
         public static string clothesFBXFolder = "Assets/FBX/Character/Models";
 
-        private static string m_unityBaseFolder = "Assets/";
+        static string m_unityBaseFolder = "Assets/";
         public static string unityBaseFolder { get { return m_unityBaseFolder; } }
 
         public enum Project {
@@ -43,20 +43,12 @@ namespace AssetBundle {
         }
 
 #if MainProject
-                static IEnumerable<BaseAssetManager> GetMainProjectConfig()
-                {
-                    //string localizedAtlasFolder = "Assets/UI/Localize/Atlas";
-                    yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/Test", "t:Prefab", "Test");                                                 // common atlas
-                                                                                                                                                                                 //yield return new NormalAssets<UObject>("Assets/UI/Font", "t:Prefab", "UI");                                                         // common font: DroidSansFallback
-                                                                                                                                                                                 //yield return new UIPrefabs("Assets/UI/Prefab", "UI", localizedAtlasFolder);                                                         // ui prefab
-                                                                                                                                                                                 //yield return new LuaCodes("Assets/Scripts/XLua/LuaScripts", "Lua");                                                                 // lua
-                    yield return new NotBuildAssetManager("Assets/Config/Data", "f:*.dat", "Data");                                                             // data
-                                                                                                                                                //yield return new NormalAssets<Texture>("Assets/Art/Image", "t:Texture2D", "Image");                                                 // image
-                                                                                                                                                //yield return new NormalAssets<IKActionPatchConfig>("Assets/Config/IKActionPatch", "f:*.asset", "assetdata/ikactionpatch");          // ik action patch, asset文件
-                                                                                                                                                //yield return new UILocalizedAtlases(localizedAtlasFolder, "t:Prefab", "localize/uiatlas");                                          // localized ui atlas
-                                                                                                                                                //yield return new TextFiles("Assets/Config/CSV/Localize", "f:*.csv", "localize/csv");                                                // 本地化csv文件
-                                                                                                                                                //yield return new TextFiles("Assets/Config/Txt", "f:*.txt", "txt");                                                                  // txt文件
-                                                                                                                                                //yield return new TextFiles("Assets/Config/CSV/NoviceGuide", "f:*.csv", "data");                                                     // 新手引导csv文件
+        static IEnumerable<BaseAssetManager> GetMainProjectConfig() {
+            //string localizedAtlasFolder = "Assets/UI/Localize/Atlas";
+            yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/Test", "t:Prefab", "Test");                                                 // common atlas
+            yield return new NormalAssetManager<Texture>(m_unityBaseFolder+ "Res/Image", "t:Texture2D", "Image");                                                                                                                                  //yield return new UIPrefabs("Assets/UI/Prefab", "UI", localizedAtlasFolder);                                                         // ui prefab
+                                                                                                                                                                                                                                                     //yield return new LuaCodes("Assets/Scripts/XLua/LuaScripts", "Lua");                                                                 // lua
+            //yield return new NotBuildAssetManager("Assets/Config/Data", "f:*.dat", "Data");                                                             // data
         }
 #endif
 
