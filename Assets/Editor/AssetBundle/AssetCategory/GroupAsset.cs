@@ -1,0 +1,57 @@
+﻿using System;
+using System.IO;
+
+namespace AssetBundle {
+    public class GroupAsset<T> : BaseAsset where T : UnityEngine.Object {
+        string m_parentPath;//资源根目录
+        string m_groupFolderPath;//文件夹目录
+        string[] m_assetPathArray;//文件夹内的所有资源路径
+
+        string m_groupName;//ab 名称(文件夹名称)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parentPath">资源根目录</param>
+        /// <param name="folderPath">文件夹目录</param>
+        /// <param name="assetPathArray">文件夹内的所有资源路径</param>
+        /// <param name="outputFolder">输出目录</param>
+        public GroupAsset(string parentPath, string folderPath, string[] assetPathArray, string outputFolder)
+            : base(outputFolder) {
+            if(string.IsNullOrEmpty(folderPath) || !folderPath.StartsWith("Assets")) {
+                throw new ArgumentException("folderPath");
+            }
+            if(assetPathArray == null) {
+                throw new ArgumentNullException("assetPathArray");
+            }
+            if(assetPathArray.Length < 1) {
+                throw new ArgumentException("assetPathArray.Length < 1");
+            }
+
+            m_parentPath = parentPath;
+            m_assetPathArray = assetPathArray;
+            m_groupName = Path.GetFileNameWithoutExtension(folderPath);
+        }
+
+        protected override string ComputeHash() {
+            return ComputeHashWithDependencies(m_assetPathArray);
+        }
+
+        public override string[] assetNames {
+            get {
+                if(isNeedBuild) {
+                    if(m_assetPathArray.Length > 0) {
+                        return m_assetPathArray;
+                    }
+                }
+                return null;
+            }
+        }
+
+        public override string name {
+            get {
+                return m_groupName;
+            }
+        }
+    }
+}

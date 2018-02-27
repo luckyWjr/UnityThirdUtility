@@ -156,7 +156,6 @@ namespace AssetBundle {
             get {
                 foreach (var item in items) {
                     if (item.isNeedBuild) {
-                        Debug.Log("item.assetBundleName:"+ item.assetBundleName);
                         yield return new AssetBundleBuild() {
                             assetBundleName = item.assetBundleName,
                             assetNames = item.assetNames,

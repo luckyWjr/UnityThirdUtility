@@ -90,7 +90,10 @@ namespace Utility {
         }
 
         public Object LoadAsset(string name, System.Type type) {
-            return asset.LoadAsset(name, type);
+            if(asset != null) {
+                return asset.LoadAsset(name, type);
+            }
+            return null;
         }
     }
 }

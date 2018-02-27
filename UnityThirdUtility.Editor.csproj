@@ -289,6 +289,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Editor\AssetBundle\AssetCategory\BaseAsset.cs" />
+    <Compile Include="Assets\Editor\AssetBundle\AssetCategory\GroupAsset.cs" />
     <Compile Include="Assets\Editor\AssetBundle\AssetCategory\NormalAsset.cs" />
     <Compile Include="Assets\Editor\AssetBundle\AssetCategory\NotBuildAsset.cs" />
     <Compile Include="Assets\Editor\AssetBundle\BuildAssetBundle.cs" />
@@ -296,10 +297,12 @@
     <Compile Include="Assets\Editor\AssetBundle\Builder.cs" />
     <Compile Include="Assets\Editor\AssetBundle\BuildSetting.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Manager\BaseAssetManager.cs" />
+    <Compile Include="Assets\Editor\AssetBundle\Manager\GroupAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Manager\NormalAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Manager\NotBuildAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Manager\TextAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Uploader.cs" />
+    <Compile Include="Assets\Editor\SpritePacker\CustomPackerPolicy.cs" />
     <Compile Include="Assets\Editor\UnityBuildHandle.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AnimationLinkEditor.cs" />
     <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AstarPathEditor.cs" />

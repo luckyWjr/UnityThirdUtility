@@ -45,9 +45,9 @@ namespace AssetBundle {
 #if MainProject
         static IEnumerable<BaseAssetManager> GetMainProjectConfig() {
             //string localizedAtlasFolder = "Assets/UI/Localize/Atlas";
-            yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/Test", "t:Prefab", "Test");                                                 // common atlas
-            yield return new NormalAssetManager<Texture>(m_unityBaseFolder+ "Res/Image", "t:Texture2D", "Image");                                                                                                                                  //yield return new UIPrefabs("Assets/UI/Prefab", "UI", localizedAtlasFolder);                                                         // ui prefab
-                                                                                                                                                                                                                                                     //yield return new LuaCodes("Assets/Scripts/XLua/LuaScripts", "Lua");                                                                 // lua
+            yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/Test", "t:Prefab", "Test");
+            yield return new NormalAssetManager<Texture>(m_unityBaseFolder+ "Res/Images", "t:Texture2D", "Images");
+            yield return new GroupAssetManager<Sprite>(m_unityBaseFolder + "Res/Sprites", "t:Sprite", "Sprites");
             //yield return new NotBuildAssetManager("Assets/Config/Data", "f:*.dat", "Data");                                                             // data
         }
 #endif

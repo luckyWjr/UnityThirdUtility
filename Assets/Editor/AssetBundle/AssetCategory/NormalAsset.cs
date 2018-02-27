@@ -6,14 +6,6 @@ namespace AssetBundle {
         string m_srcFolder;//资源根目录
         string m_nameToSrcFolder;//ab 名称(路径+文件名 = m_assetPath - m_srcFolder)
 
-        public static string GetNameToSrcFolder(string assetPath, string srcFolder) {
-            srcFolder = srcFolder.Replace("\\", "/").TrimEnd('/');
-            int startIndex = srcFolder.Length + 1;
-            int lastIndex = assetPath.LastIndexOf(".");
-            int length = lastIndex - startIndex;
-            return assetPath.Substring(startIndex, length);
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -40,8 +32,9 @@ namespace AssetBundle {
 
         public override string name {
             get {
-                if (string.IsNullOrEmpty(m_nameToSrcFolder))
+                if(string.IsNullOrEmpty(m_nameToSrcFolder)) {
                     m_nameToSrcFolder = GetNameToSrcFolder(m_assetPath, m_srcFolder);
+                }
                 return m_nameToSrcFolder;
             }
         }
@@ -52,6 +45,14 @@ namespace AssetBundle {
 
         protected string srcFolder {
             get { return m_srcFolder; }
+        }
+
+        protected virtual string GetNameToSrcFolder(string assetPath, string srcFolder) {
+            srcFolder = srcFolder.Replace("\\", "/").TrimEnd('/');
+            int startIndex = srcFolder.Length + 1;
+            int lastIndex = assetPath.LastIndexOf(".");
+            int length = lastIndex - startIndex;
+            return assetPath.Substring(startIndex, length);
         }
     }
 }
