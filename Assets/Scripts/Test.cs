@@ -9,6 +9,8 @@ namespace newnamespace {
 
 	public class Test : MonoBehaviour {
 
+        [SerializeField] Transform m_canvasTrans;
+
 		void Start () {
 
             //StartCoroutine(WebUtility.instance.GetData("data/qq.txt", (WWW _data) => {
@@ -23,8 +25,18 @@ namespace newnamespace {
             //imageAsset.Load(() => {
             //    GameObject.Find("RawImage").GetComponent<RawImage>().texture = imageAsset.texture;
             //});
+
+            SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun3");
+            spriteAsset3.Load(() => {
+                UIPrefabAssetItem imageAsset = new UIPrefabAssetItem("", "TestPanel");
+                imageAsset.Load(() => {
+                    GameObject obj = Instantiate(imageAsset.prefab);
+                    obj.transform.SetParent(m_canvasTrans, false);
+                    obj.transform.localPosition = Vector3.zero;
+                });
+            });
         }
-		
-		
-	}
+
+
+    }
 }

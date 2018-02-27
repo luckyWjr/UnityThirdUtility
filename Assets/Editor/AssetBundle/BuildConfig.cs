@@ -48,7 +48,8 @@ namespace AssetBundle {
             yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/Test", "t:Prefab", "Test");
             yield return new NormalAssetManager<Texture>(m_unityBaseFolder+ "Res/Images", "t:Texture2D", "Images");
             yield return new GroupAssetManager<Sprite>(m_unityBaseFolder + "Res/Sprites", "t:Sprite", "Sprites");
-            //yield return new NotBuildAssetManager("Assets/Config/Data", "f:*.dat", "Data");                                                             // data
+            yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/UIPrefabs", "t:Prefab", "UIPrefabs");
+            //yield return new NotBuildAssetManager("Assets/Config/Data", "f:*.dat", "Data");// data
         }
 #endif
 

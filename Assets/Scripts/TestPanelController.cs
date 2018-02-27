@@ -14,20 +14,21 @@ namespace newnamespace {
         [SerializeField] RawImage m_rawImage1;
 
         void Start () {
-            SpriteAssetItem spriteAsset1 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun1");
-            spriteAsset1.Load(() => {
-                m_image1.sprite = spriteAsset1.sprite;
-            });
+            Debug.Log("TestPanelController");
+            //SpriteAssetItem spriteAsset1 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun1");
+            //spriteAsset1.Load(() => {
+            //    m_image1.sprite = spriteAsset1.sprite;
+            //});
 
-            SpriteAssetItem spriteAsset2 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun2");
-            spriteAsset2.Load(() => {
-                m_image2.sprite = spriteAsset2.sprite;
-            });
+            //SpriteAssetItem spriteAsset2 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun2");
+            //spriteAsset2.Load(() => {
+            //    m_image2.sprite = spriteAsset2.sprite;
+            //});
 
-            SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun3");
-            spriteAsset3.Load(() => {
-                m_image3.sprite = spriteAsset3.sprite;
-            });
+            //SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun3");
+            //spriteAsset3.Load(() => {
+            //    m_image3.sprite = spriteAsset3.sprite;
+            //});
         }
 
         void Update () {
