@@ -26,15 +26,15 @@ namespace newnamespace {
             //    GameObject.Find("RawImage").GetComponent<RawImage>().texture = imageAsset.texture;
             //});
 
-            SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun3");
-            spriteAsset3.Load(() => {
-                UIPrefabAssetItem imageAsset = new UIPrefabAssetItem("", "TestPanel");
-                imageAsset.Load(() => {
-                    GameObject obj = Instantiate(imageAsset.prefab);
-                    obj.transform.SetParent(m_canvasTrans, false);
-                    obj.transform.localPosition = Vector3.zero;
-                });
-            });
+            //SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder, "xun3");
+            //spriteAsset3.Load(() => {
+            //    UIPrefabAssetItem imageAsset = new UIPrefabAssetItem("", "TestPanel");
+            //    imageAsset.Load(() => {
+            //        GameObject obj = Instantiate(imageAsset.prefab);
+            //        obj.transform.SetParent(m_canvasTrans, false);
+            //        obj.transform.localPosition = Vector3.zero;
+            //    });
+            //});
         }
 
 

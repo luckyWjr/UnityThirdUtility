@@ -237,6 +237,8 @@
     <Compile Include="Assets\Scripts\SingleClass.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
     <Compile Include="Assets\Scripts\TestPanelController.cs" />
+    <Compile Include="Assets\Scripts\UI\UICoroutine.cs" />
+    <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\GroupAssetItem.cs" />
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\ImageAssetItem.cs" />
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\NormalAssetItem.cs" />
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\SpriteAssetItem.cs" />

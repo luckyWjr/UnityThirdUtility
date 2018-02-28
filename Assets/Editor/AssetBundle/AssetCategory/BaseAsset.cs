@@ -34,6 +34,9 @@ namespace AssetBundle {
             }
         }
 
+        /// <summary>
+        /// AB 的包名
+        /// </summary>
         public string assetBundleName {
             get { return outputRelativePath + ext; }
         }
@@ -72,6 +75,9 @@ namespace AssetBundle {
 
         public abstract string name { get; }
 
+        /// <summary>
+        /// AB里面资源的名称（即路径）
+        /// </summary>
         public abstract string[] assetNames { get; }
         #endregion
 

@@ -2,7 +2,7 @@
 using UI;
 
 namespace Utility {
-    public abstract class NormalAssetItem {
+    public abstract class GroupAssetItem {
         /// <summary>
         /// 同类资源根文件夹,如 Image/ ,Effect/ 等
         /// </summary>
@@ -11,36 +11,29 @@ namespace Utility {
         /// 子文件夹 如 Image/ 下 Bg/ ,Icon/ 等
         /// </summary>
         public string folder = string.Empty;
-        /// <summary>
-        /// 文件名 如 Icon/ 下 suc ,fail 等
-        /// </summary>
-        public string name = string.Empty;
-
-        protected UnityEngine.Object m_obj;
 
         protected Action m_callback;
         protected string m_fullPath;
+        protected AssetBundleItem assetBundleItem;
 
         public virtual void Load() {
-            AssetBundleItem assetBundleItem = AssetBundleUtility.Load(m_fullPath, name);
-            m_obj = assetBundleItem.LoadAsset(typeof(UnityEngine.Object));
+            assetBundleItem = AssetBundleUtility.Load(m_fullPath, "");
         }
 
         public virtual void LoadAsync(Action callback = null) {
             m_callback = callback;
-            UICoroutine.instance.StartCoroutine(AssetBundleUtility.LoadAsync(m_fullPath, name, LoadAsyncCallback));
+            UICoroutine.instance.StartCoroutine(AssetBundleUtility.LoadAsync(m_fullPath, "", LoadAsyncCallback));
         }
 
         void LoadAsyncCallback(AssetBundleItem ab) {
-            m_obj = ab.LoadAsset(typeof(UnityEngine.Object));
+            assetBundleItem = ab;
             if(m_callback != null) {
                 m_callback();
             }
         }
 
         public void Destroy() {
-            if(m_obj != null) {
-                m_obj = null;
+            if(assetBundleItem.asset != null) {
                 AssetBundleUtility.Delete(m_fullPath);
             }
         }
