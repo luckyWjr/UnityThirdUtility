@@ -24,10 +24,5 @@ namespace Utility {
                 return (GameObject)m_obj;
             }
         }
-
-        //public override void Load(Action callback = null) {
-        //    base.Load(callback);
-
-        //}
     }
 }

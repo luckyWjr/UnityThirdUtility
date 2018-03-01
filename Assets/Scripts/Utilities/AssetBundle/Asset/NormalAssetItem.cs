@@ -21,8 +21,8 @@ namespace Utility {
         protected Action m_callback;
         protected string m_fullPath;
 
-        public virtual void Load() {
-            AssetBundleItem assetBundleItem = AssetBundleUtility.Load(m_fullPath, name);
+        public virtual void Load(bool isHasDependence = true) {
+            AssetBundleItem assetBundleItem = AssetBundleUtility.Load(m_fullPath, name, isHasDependence);
             m_obj = assetBundleItem.LoadAsset(typeof(UnityEngine.Object));
         }
 

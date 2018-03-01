@@ -17,7 +17,7 @@ namespace Utility {
         protected AssetBundleItem assetBundleItem;
 
         public virtual void Load() {
-            assetBundleItem = AssetBundleUtility.Load(m_fullPath, "");
+            assetBundleItem = AssetBundleUtility.Load(m_fullPath, "", false);
         }
 
         public virtual void LoadAsync(Action callback = null) {
@@ -33,7 +33,7 @@ namespace Utility {
         }
 
         public void Destroy() {
-            if(assetBundleItem.asset != null) {
+            if(assetBundleItem != null) {
                 AssetBundleUtility.Delete(m_fullPath);
             }
         }

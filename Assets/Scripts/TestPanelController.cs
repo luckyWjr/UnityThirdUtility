@@ -15,16 +15,12 @@ namespace newnamespace {
 
         void Start () {
 
-            SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder);
-            spriteAsset3.LoadAsync(() => {
-                m_image1.sprite = spriteAsset3.GetSprite("xun1");
-                m_image2.sprite = spriteAsset3.GetSprite("xun2");
-                m_image3.sprite = spriteAsset3.GetSprite("xun3");
-            });
+            //SpriteAssetItem spriteAsset3 = new SpriteAssetItem(SpriteAssetItem.iconFolder);
+            //spriteAsset3.LoadAsync(() => {
+            //    m_image1.sprite = spriteAsset3.GetSprite("xun1");
+            //    m_image2.sprite = spriteAsset3.GetSprite("xun2");
+            //    m_image3.sprite = spriteAsset3.GetSprite("xun3");
+            //});
         }
-
-        void Update () {
-			
-		}
 	}
 }

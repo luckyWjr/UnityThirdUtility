@@ -187,13 +187,14 @@ namespace AssetBundle {
             AssetDatabase.Refresh();
 
             BuildPipeline.BuildAssetBundles(folder, list.ToArray(), BuildConfig.buildingOptions, BuildSetting.instance.selectedBuildTarget);
+            
             // delete manifest files
-            string[] manifestFiles = Directory.GetFiles(folder, "*.manifest", SearchOption.AllDirectories);
-            foreach (var mf in manifestFiles) {
-                File.Delete(mf);
-            }
-            string folderFile = string.Format("{0}/{1}", folder, Path.GetFileNameWithoutExtension(folder));
-            File.Delete(folderFile);
+            //string[] manifestFiles = Directory.GetFiles(folder, "*.manifest", SearchOption.AllDirectories);
+            //foreach (var mf in manifestFiles) {
+            //    File.Delete(mf);
+            //}
+            //string folderFile = string.Format("{0}/{1}", folder, Path.GetFileNameWithoutExtension(folder));
+            //File.Delete(folderFile);
         }
 
         static void UpdateBuildingItemsFlag(List<BaseAssetManager> managerList, string[] lastBuildConfig, out List<string> removedList) {
