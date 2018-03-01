@@ -9,8 +9,9 @@ namespace Utility {
     /// </summary>
 	public class ImageAssetItem : NormalAssetItem {
 
-        const string imageAssetFolder = @"Image/";
+        const string imageAssetFolder = @"Images/";
         public const string iconFolder = @"Icon/";
+        public const string backgroundFolder = @"Background/";
 
         public ImageAssetItem(string folder, string name) {
             assetCategoryPath = imageAssetFolder;

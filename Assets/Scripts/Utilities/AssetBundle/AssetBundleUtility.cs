@@ -31,22 +31,6 @@ namespace Utility {
 
         static Dictionary<string, AssetBundleItem> cacheAssets = new Dictionary<string, AssetBundleItem>();
 
-        //public static AssetBundleItem Load(string path, string fileName, bool isHasDependence = true) {
-
-        //    path = path.ToLower();
-        //    fileName = fileName.ToLower();
-        //    AssetBundleItem ab;
-        //    if(cacheAssets.ContainsKey(path)) {
-        //        ab = cacheAssets[path];
-        //    } else {
-        //        ab = new AssetBundleItem(path, fileName);
-        //        ab.asset = AssetBundle.LoadFromFile(ab.pathName);
-        //        cacheAssets[path] = ab;
-        //    }
-        //    ab.refCount++;
-        //    return ab;
-        //}
-
         public static AssetBundleItem Load(string path, string fileName, bool isHasDependence = true) {
             if(mainfest != null) {
                 path = path.ToLower();
@@ -80,26 +64,47 @@ namespace Utility {
                 ab.refCount++;
                 return ab;
             }
-            Debug.LogError("error LoadWithDependence");
             return null;
         }
 
         public static IEnumerator LoadAsync(string path, string fileName, System.Action<AssetBundleItem> callback, bool isHasDependence = true) {
-            path = path.ToLower();
-            fileName = fileName.ToLower();
-            AssetBundleItem ab;
-            if(cacheAssets.ContainsKey(path)) {
-                ab = cacheAssets[path];
-            } else {
-                ab = new AssetBundleItem(path, fileName, isHasDependence);
-                AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(ab.pathName);
-                yield return request;
-                ab.asset = request.assetBundle;
-                cacheAssets[path] = ab;
-            }
-            ab.refCount++;
-            if(callback != null) {
-                callback(ab);
+            if(mainfest != null) {
+                path = path.ToLower();
+                fileName = fileName.ToLower();
+
+                if(isHasDependence) {
+                    //读取依赖
+                    string[] dps = mainfest.GetAllDependencies(path);
+                    int len = dps.Length;
+                    for(int i = 0; i < len; i++) {
+                        AssetBundleItem dItem;
+                        if(cacheAssets.ContainsKey(dps[i])) {
+                            dItem = cacheAssets[dps[i]];
+                        } else {
+                            dItem = new AssetBundleItem(dps[i], fileName, false);
+                            AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(dItem.pathName);
+                            yield return request;
+                            dItem.asset = request.assetBundle;
+                            cacheAssets[dps[i]] = dItem;
+                        }
+                        dItem.refCount++;
+                    }
+                }
+
+                AssetBundleItem ab;
+                if(cacheAssets.ContainsKey(path)) {
+                    ab = cacheAssets[path];
+                } else {
+                    ab = new AssetBundleItem(path, fileName, isHasDependence);
+                    AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(ab.pathName);
+                    yield return request;
+                    ab.asset = request.assetBundle;
+                    cacheAssets[path] = ab;
+                }
+                ab.refCount++;
+                if(callback != null) {
+                    callback(ab);
+                }
             }
         }
 

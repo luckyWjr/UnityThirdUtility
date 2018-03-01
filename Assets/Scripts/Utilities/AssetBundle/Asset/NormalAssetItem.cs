@@ -21,14 +21,18 @@ namespace Utility {
         protected Action m_callback;
         protected string m_fullPath;
 
+        /// <summary>
+        /// 加载AssetBundle，获取里面的Asset
+        /// </summary>
+        /// <param name="isHasDependence">是否存在依赖</param>
         public virtual void Load(bool isHasDependence = true) {
             AssetBundleItem assetBundleItem = AssetBundleUtility.Load(m_fullPath, name, isHasDependence);
             m_obj = assetBundleItem.LoadAsset(typeof(UnityEngine.Object));
         }
 
-        public virtual void LoadAsync(Action callback = null) {
+        public virtual void LoadAsync(Action callback = null, bool isHasDependence = true) {
             m_callback = callback;
-            UICoroutine.instance.StartCoroutine(AssetBundleUtility.LoadAsync(m_fullPath, name, LoadAsyncCallback));
+            UICoroutine.instance.StartCoroutine(AssetBundleUtility.LoadAsync(m_fullPath, name, LoadAsyncCallback, isHasDependence));
         }
 
         void LoadAsyncCallback(AssetBundleItem ab) {

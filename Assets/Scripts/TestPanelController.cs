@@ -21,6 +21,10 @@ namespace newnamespace {
             //    m_image2.sprite = spriteAsset3.GetSprite("xun2");
             //    m_image3.sprite = spriteAsset3.GetSprite("xun3");
             //});
+
+            ImageAssetItem imageAsset = new ImageAssetItem(ImageAssetItem.backgroundFolder, "siyuebg1");
+            imageAsset.Load(false);
+            GameObject.Find("RawImage").GetComponent<RawImage>().texture = imageAsset.texture;
         }
-	}
+    }
 }

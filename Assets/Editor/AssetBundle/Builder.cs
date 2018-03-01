@@ -187,12 +187,12 @@ namespace AssetBundle {
             AssetDatabase.Refresh();
 
             BuildPipeline.BuildAssetBundles(folder, list.ToArray(), BuildConfig.buildingOptions, BuildSetting.instance.selectedBuildTarget);
-            
+
             // delete manifest files
-            //string[] manifestFiles = Directory.GetFiles(folder, "*.manifest", SearchOption.AllDirectories);
-            //foreach (var mf in manifestFiles) {
-            //    File.Delete(mf);
-            //}
+            string[] manifestFiles = Directory.GetFiles(folder, "*.manifest", SearchOption.AllDirectories);
+            foreach(var mf in manifestFiles) {
+                File.Delete(mf);
+            }
             //string folderFile = string.Format("{0}/{1}", folder, Path.GetFileNameWithoutExtension(folder));
             //File.Delete(folderFile);
         }
