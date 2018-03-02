@@ -253,18 +253,6 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
-    <Reference Include="Pathfinding.ClipperLib">
-      <HintPath>Assets/ThirdUtilities/AstarPathfindingProject/Plugins/Clipper/Pathfinding.ClipperLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Pathfinding.Ionic.Zip.Reduced">
-      <HintPath>Assets/ThirdUtilities/AstarPathfindingProject/Plugins/DotNetZip/Pathfinding.Ionic.Zip.Reduced.dll</HintPath>
-    </Reference>
-    <Reference Include="Pathfinding.JsonFx">
-      <HintPath>Assets/ThirdUtilities/AstarPathfindingProject/Plugins/JsonFx/Pathfinding.JsonFx.dll</HintPath>
-    </Reference>
-    <Reference Include="Pathfinding.Poly2Tri">
-      <HintPath>Assets/ThirdUtilities/AstarPathfindingProject/Plugins/Poly2Tri/Pathfinding.Poly2Tri.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor.Advertisements">
       <HintPath>C:/Users/Administrator/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.ads@1.0.7/Editor/UnityEditor.Advertisements.dll</HintPath>
     </Reference>
@@ -304,47 +292,9 @@
     <Compile Include="Assets\Editor\AssetBundle\Uploader.cs" />
     <Compile Include="Assets\Editor\SpritePacker\CustomPackerPolicy.cs" />
     <Compile Include="Assets\Editor\UnityBuildHandle.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AnimationLinkEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AstarPathEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AstarUpdateChecker.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\AstarUpdateWindow.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\CustomGraphEditorAttribute.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\EditorGUIx.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\EditorUtilities.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphEditors\GraphEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphEditors\GridGeneratorEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphEditors\LayerGridGraphEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphEditors\NavMeshGeneratorEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphEditors\PointGeneratorEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphEditors\RecastGraphEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\GraphUpdateSceneEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\Misc\AstarEnumFlagDrawer.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\ModifierEditors\RaycastModifierEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\ModifierEditors\SmoothModifierEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\OptimizationHandler.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\RecastMeshObjEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\RVONavmeshEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\RVOSimulatorEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\RVOSquareObstacleEditor.cs" />
-    <Compile Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\SeekerEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Particle Add 1.shader" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Editor\EditorAssets\Materials\Navmesh2.shader" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\Example8_PathTypes\SquareShader.shader" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\Materials\DiffuseAlwaysVisible.shader" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\Materials\Projector Light.shader" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\Materials\Projector Multiply.shader" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\ExampleScenes\_Example Scenes.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Plugins\Clipper\ClipperLicense.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Plugins\DotNetZip\DotNetZipLicense.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Plugins\JsonFx\JsonFxLicense.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Plugins\JsonFx\Readme.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Plugins\Poly2Tri\Poly2TriLicense.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Plugins\dependencies.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Readme.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\Readme_upgrading.txt" />
-    <None Include="Assets\ThirdUtilities\AstarPathfindingProject\link.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
