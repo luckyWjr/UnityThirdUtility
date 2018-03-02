@@ -219,9 +219,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Character\AstarAI.cs" />
     <Compile Include="Assets\Scripts\Manager\CallbackManager.cs" />
     <Compile Include="Assets\Scripts\Manager\ListenerManager.cs" />
+    <Compile Include="Assets\Scripts\Nav\BaseNavigation.cs" />
     <Compile Include="Assets\Scripts\SingleClass.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
     <Compile Include="Assets\Scripts\TestPanelController.cs" />
@@ -233,6 +233,10 @@
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\UIPrefabAssetItem.cs" />
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\AssetBundleUtility.cs" />
     <Compile Include="Assets\Scripts\Utilities\WebUtility.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Scripts\NavMeshLink.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Scripts\NavMeshModifier.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Scripts\NavMeshModifierVolume.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Scripts\NavMeshSurface.cs" />
     <Compile Include="Assets\ThirdUtilities\SimpleJson\SimpleJSON.cs" />
     <Compile Include="Assets\ThirdUtilities\SimpleJson\SimpleJSONBinary.cs" />
     <Compile Include="Assets\ThirdUtilities\SimpleJson\SimpleJSONUnity.cs" />

@@ -292,6 +292,11 @@
     <Compile Include="Assets\Editor\AssetBundle\Uploader.cs" />
     <Compile Include="Assets\Editor\SpritePacker\CustomPackerPolicy.cs" />
     <Compile Include="Assets\Editor\UnityBuildHandle.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Editor\NavMeshComponentsGUIUtility.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Editor\NavMeshLinkEditor.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Editor\NavMeshModifierEditor.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Editor\NavMeshModifierVolumeEditor.cs" />
+    <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Editor\NavMeshSurfaceEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Particle Add 1.shader" />
