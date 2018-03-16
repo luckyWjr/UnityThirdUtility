@@ -6,8 +6,8 @@ namespace AssetBundle {
 
 	public class TextAssetManager : NormalAssetManager<Object> {
 
-        public TextAssetManager(string srcFolder, string filter, string outputFolder)
-            : base(srcFolder, filter, outputFolder) {
+        public TextAssetManager(string assetFolderPath, string filter, string outputFolderName)
+            : base(assetFolderPath, filter, outputFolderName) {
 
         }
 

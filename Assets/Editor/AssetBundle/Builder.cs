@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEditor;
-using UnityEngine;
+using Utility;
 
 namespace AssetBundle {
     public static class Builder {
@@ -19,7 +19,6 @@ namespace AssetBundle {
             // 1. 读取打包资源列表配置
             yield return "读取打包列表配置...";
             List<BaseAssetManager> managerList = BuildConfig.GetAssetManagerList();
-            Debug.Log("managerList.count:"+ managerList.Count);
             if (managerList == null || managerList.Count < 1) {
                 string str = "无任何要打包的资源，请检查配置是否正确。";
                 yield return str;
@@ -35,53 +34,61 @@ namespace AssetBundle {
 
             // 2. 读取上次打包结果
             yield return "读取上次打包结果...";
-            string[] lastBuildConfig = null;
+            List<string> lastBuildConfigList = null;
             if (File.Exists(BuildConfig.buildingListPath)) {
-                lastBuildConfig = File.ReadAllLines(BuildConfig.buildingListPath);
-                foreach (var c in managerList) {
-                    foreach (var item in c.items) {
-                        item.ReadConfig(lastBuildConfig);
+                string[] lastBuildConfig = File.ReadAllLines(BuildConfig.buildingListPath);
+                if(lastBuildConfig != null && lastBuildConfig.Length > 0) {
+                    lastBuildConfigList = new List<string>(lastBuildConfig);
+                    int findIndex;
+                    foreach(var manager in managerList) {
+                        foreach(var item in manager.items) {
+                            findIndex = item.ReadConfig(lastBuildConfigList);
+                            //找到对应文件下标则删除该列数据
+                            if(findIndex >= 0) {
+                                lastBuildConfigList.RemoveAt(findIndex);
+                            }
+                        }
                     }
                 }
             } else {
                 yield return "这是第一次打包。";
             }
 
-            // 3. 计算资源的哈希值...
-            yield return "计算资源的哈希值...";
-            foreach (var c in managerList) {
-                c.ComputeHash();
+            // 3. 计算资源的Md5...
+            yield return "计算资源的Md5...";
+            foreach (var manager in managerList) {
+                manager.ComputeMd5();
             }
 
-            // 4. 与上次打包时资源哈希值比较...
-            if (lastBuildConfig != null) {
-                yield return "与上次打包时资源哈希值比较...";
-            }
+            
             bool needBuild = false;
             sb.Length = 0;
             sb.AppendLine("需要重新打包的资源如下：");
-            foreach (var c in managerList) {
-                if (c.isChange) {
+            foreach (var manager in managerList) {
+                if (manager.isChange) {
                     needBuild = true;
-                    sb.AppendLine(c.srcFolder);
+                    sb.AppendLine(manager.assetFolderPath);
                 }
             }
 
-            List<string> removedList;
-            UpdateBuildingItemsFlag(managerList, lastBuildConfig, out removedList);
+            //lastBuildConfigList还未删除的数据说明已经没有这些资源需要打包，即要删掉对应的AB包
+            List<string> removedList = GetFileNeedRemoveArray(lastBuildConfigList);
 
-            // 5. 打包
+            // 4. 打包
             if (needBuild) {
+
+                UpdateBuildingItemsFlag(managerList);
+
                 yield return sb.ToString();
 
                 // 打包
-                yield return "打包中..."+ BuildConfig.tempBuildingProductsFolder;
+                yield return "打包中..."+ BuildConfig.tempbuildingAssetBundlesFolder;
 
                 // 先打到一个临时目录
-                UnityBuild(BuildConfig.tempBuildingProductsFolder, managerList);
+                UnityBuild(BuildConfig.tempbuildingAssetBundlesFolder, managerList);
 
                 // 检查是否所有的包都已正确生成
-                bool succeed = IsAllAssetBuildSucceed(managerList, BuildConfig.buildingProductsFolder);
+                bool succeed = IsAllAssetBuildSucceed(managerList, BuildConfig.buildingAssetBundlesFolder);
                 if (!succeed) {
                     throw new InvalidOperationException("生成失败，未知原因");
                 }
@@ -105,12 +112,12 @@ namespace AssetBundle {
             // 6. 生成列表文件，版本文件，日志文件
             yield return "生成增量文件...";
             if (isVersionChanged) {
-                SaveBuildingListFile(managerList, BuildConfig.tempBuildingListPath, ref sb);       // 供打包用的列表文件
+                SaveBuildingListFile(managerList, BuildConfig.tempBuildingListPath, ref sb);        // 供打包用的列表文件
                 int version = UpdateVersion();
-                WriteVersionFile(BuildConfig.tempBuildingVersionPath, version);                              // 供打包用的版本文件
+                WriteVersionFile(BuildConfig.tempBuildingVersionPath, version);                     // 供打包用的版本文件
             }
 
-            // 供下载用的版本文件
+            // 供下载用的版本文件（存本地版本号，用于和服务器上最新版本号对比）
             string strVersion = SaveLoadingVersionFile(BuildConfig.tempLoadingVersionPath);
             yield return "最新版本为： " + strVersion;
 
@@ -129,18 +136,19 @@ namespace AssetBundle {
             DeleteRemovedAssetBundles(removedList);
 
             // dispose
-            foreach (var c in managerList) {
-                c.Dispose();
+            foreach (var manager in managerList) {
+                manager.Dispose();
             }
         }
 
         static bool IsAllAssetBuildSucceed(List<BaseAssetManager> managerList, string folder) {
             bool succeed = true;
             bool exist;
+            string path;
             foreach (var manager in managerList) {
                 foreach (var item in manager.items) {
                     if (item.flag != AssetFlag.NoChange) {
-                        string path = string.Format("{0}/{1}{2}", BuildConfig.tempBuildingProductsFolder, item.outputRelativePath, item.ext);
+                        path = string.Format("{0}/{1}", BuildConfig.tempbuildingAssetBundlesFolder, item.assetBundleName);
                         exist = File.Exists(path);
                         if (!exist) {
                             succeed = false;
@@ -156,28 +164,29 @@ namespace AssetBundle {
         static void CopyFiles(string fromDir, string toDir) {
             string[] files = Directory.GetFiles(fromDir, "*.*", SearchOption.AllDirectories);
             int formDirLen = fromDir.Length;
+            string relativePath, targetFile;
             for (int i = 0, j = files.Length; i < j; i++) {
-                string relativePath = files[i].Substring(formDirLen);
-                string targetFile = string.Format("{0}{1}", toDir, relativePath);
+                relativePath = files[i].Substring(formDirLen);
+                targetFile = string.Format("{0}{1}", toDir, relativePath);
                 Uploader.CreateDirectory(targetFile);
                 File.Copy(files[i], targetFile, true);
             }
         }
 
         static void UnityBuild(string folder, List<BaseAssetManager> managerList) {
-            if (Directory.Exists(folder)) {
+            if(Directory.Exists(folder)) {
                 Directory.Delete(folder, true);
             }
             Directory.CreateDirectory(folder);
 
             // 准备打包
             List<AssetBundleBuild> list = new List<AssetBundleBuild>();
-            foreach (var manager in managerList) {
-                if (manager.isChange) {
+            foreach(var manager in managerList) {
+                if(manager.isChange) {
                     var noPackAssets = manager as NotBuildAssetManager;
-                    if (noPackAssets != null) {
+                    if(noPackAssets != null) {
                         // 无需打包的资源
-                        noPackAssets.Build(BuildConfig.tempBuildingProductsFolder);
+                        noPackAssets.Build(BuildConfig.tempbuildingAssetBundlesFolder);
                     } else {
                         manager.PrepareBuild();
                         list.AddRange(manager.assetBundleBuilds);
@@ -197,46 +206,45 @@ namespace AssetBundle {
             //File.Delete(folderFile);
         }
 
-        static void UpdateBuildingItemsFlag(List<BaseAssetManager> managerList, string[] lastBuildConfig, out List<string> removedList) {
-            foreach (var c in managerList) {
-                foreach (var item in c.items) {
-                    if (string.IsNullOrEmpty(item.lastHash)) {
+        /// <summary>
+        /// 更新每个Asset资源的状态
+        /// </summary>
+        /// <param name="managerList">需要打包的Asset</param>
+        static void UpdateBuildingItemsFlag(List<BaseAssetManager> managerList) {
+            foreach (var manager in managerList) {
+                foreach (var item in manager.items) {
+                    if (string.IsNullOrEmpty(item.lastMd5)) {
                         item.flag = AssetFlag.NewAdded;   // 新增的
-                    } else if (item.lastHash != item.currentHash) {
+                    } else if (item.lastMd5 != item.currentMd5) {
                         item.flag = AssetFlag.Modified;   // 修改的
                     } else {
                         item.flag = AssetFlag.NoChange;
                     }
                 }
             }
+        }
 
-            removedList = new List<string>();
-            if (lastBuildConfig != null) {
-                foreach (var line in lastBuildConfig) {
-                    bool removed = true;
-                    foreach (var c in managerList) {
-                        foreach (var item in c.items) {
-                            if (item.RightConfig(line)) {
-                                removed = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    // 删除的
-                    if (removed) {
-                        string relativePath, hash;
-                        BaseAsset.ParseConfigLine(line, out relativePath, out hash);
-                        removedList.Add(relativePath);
-                    }
+        /// <summary>
+        /// 获取需要删除的AB列表
+        /// </summary>
+        /// <param name="lastBuildConfig">剩下的表数据</param>
+        /// <returns>要删除的AB文件路径数组</returns>
+        static List<string> GetFileNeedRemoveArray(List<string> lastBuildConfig) {
+            List<string> removedList = new List<string>();
+            string relativePath, hash;
+            if(lastBuildConfig != null) {
+                foreach(var line in lastBuildConfig) {
+                    BaseAsset.ParseConfigLine(line, out relativePath, out hash);
+                    removedList.Add(relativePath);
                 }
             }
+            return removedList;
         }
 
         static void DeleteRemovedAssetBundles(List<string> removedList) {
             for (int i = 0; i < removedList.Count; i++) {
                 // 从磁盘中删除
-                string fullPath = string.Format("{0}/{1}", BuildConfig.buildingProductsFolder.TrimEnd('/'), removedList[i]);
+                string fullPath = string.Format("{0}/{1}", BuildConfig.buildingAssetBundlesFolder.TrimEnd('/'), removedList[i]);
                 if (Directory.Exists(Path.GetDirectoryName(fullPath)))
                     File.Delete(fullPath);
             }
@@ -248,12 +256,14 @@ namespace AssetBundle {
             List<string> addedList = new List<string>();
             List<string> modifiedList = new List<string>();
 
-            foreach (var c in managerList) {
-                foreach (var item in c.items) {
-                    if (item.flag == AssetFlag.NewAdded)                // 新增的
-                        addedList.Add(item.outputRelativePath);
-                    else if (item.flag == AssetFlag.Modified)             // 修改的
-                        modifiedList.Add(item.outputRelativePath);
+            foreach (var manager in managerList) {
+                foreach (var item in manager.items) {
+                    if(item.flag == AssetFlag.NewAdded) {
+                        addedList.Add(item.assetBundleName);
+                    }            
+                    else if (item.flag == AssetFlag.Modified) {
+                        modifiedList.Add(item.assetBundleName);
+                    }  
                 }
             }
 
@@ -323,22 +333,27 @@ namespace AssetBundle {
         static void SaveLoadingListFile(List<BaseAssetManager> managerList, string path) {
             StringBuilder sb = new StringBuilder();
 
-            // calc hash
-            for (int i = 0; i < managerList.Count; i++) {
-                for (int j = 0; j < managerList[i].items.Length; j++) {
+            string itemPath, name, md5;
+            int startIndex;
+            byte[] bytes;
+
+            for (int i = 0, j = 0; i < managerList.Count; i++) {
+                for (j = 0; j < managerList[i].items.Length; j++) {
                     var item = managerList[i].items[j];
-                    string p;
-                    if (item.flag == AssetFlag.NoChange)
-                        p = string.Format("{0}/{1}{2}", BuildConfig.buildingProductsFolder, item.outputRelativePath, item.ext);
-                    else
-                        p = string.Format("{0}/{1}{2}", BuildConfig.tempBuildingProductsFolder, item.outputRelativePath, item.ext);
+                    
+                    if (item.flag == AssetFlag.NoChange) {
+                        itemPath = string.Format("{0}/{1}", BuildConfig.buildingAssetBundlesFolder, item.assetBundleName);
+                    } else {
+                        itemPath = string.Format("{0}/{1}", BuildConfig.tempbuildingAssetBundlesFolder, item.assetBundleName);
+                    }
 
-                    int startIndex = BuildConfig.buildingProductsFolder.Length + 1;
-                    string name = p.Substring(startIndex);
-                    byte[] bytes = File.ReadAllBytes(p);
-                    string hash = BaseAsset.ComputeHash(bytes);
+                    startIndex = BuildConfig.buildingAssetBundlesFolder.Length + 1;
+                    name = itemPath.Substring(startIndex);
+                    bytes = null;
+                    bytes = File.ReadAllBytes(itemPath);
+                    md5 = TypeConvertUtility.ByteToMd5(bytes);
 
-                    sb.AppendFormat("{0},{1},{2};", name, hash, bytes.Length);
+                    sb.AppendFormat("{0},{1},{2};", name, md5, bytes.Length);
                 }
             }
 
@@ -347,8 +362,8 @@ namespace AssetBundle {
 
         static void SaveBuildingListFile(List<BaseAssetManager> managerList, string path, ref StringBuilder sb) {
             sb.Length = 0;
-            foreach (var c in managerList) {
-                foreach (var item in c.items) {
+            foreach (var manager in managerList) {
+                foreach (var item in manager.items) {
                     string config = item.GenerateConfigLine();
                     sb.AppendLine(config);
                 }

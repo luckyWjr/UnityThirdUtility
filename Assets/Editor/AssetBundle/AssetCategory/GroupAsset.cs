@@ -9,15 +9,12 @@ namespace AssetBundle {
 
         string m_groupName;//ab 名称(文件夹名称)
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="parentPath">资源根目录</param>
         /// <param name="folderPath">文件夹目录</param>
         /// <param name="assetPathArray">文件夹内的所有资源路径</param>
-        /// <param name="outputFolder">输出目录</param>
-        public GroupAsset(string parentPath, string folderPath, string[] assetPathArray, string outputFolder)
-            : base(outputFolder) {
+        /// <param name="outputFolderName">输出目录</param>
+        public GroupAsset(string parentPath, string folderPath, string[] assetPathArray, string outputFolderName)
+            : base(outputFolderName) {
             if(string.IsNullOrEmpty(folderPath) || !folderPath.StartsWith("Assets")) {
                 throw new ArgumentException("folderPath");
             }
@@ -33,8 +30,8 @@ namespace AssetBundle {
             m_groupName = Path.GetFileNameWithoutExtension(folderPath);
         }
 
-        protected override string ComputeHash() {
-            return ComputeHashWithDependencies(m_assetPathArray);
+        protected override string ComputeMd5() {
+            return ComputeMd5WithDependencies(m_assetPathArray);
         }
 
         public override string[] assetNames {

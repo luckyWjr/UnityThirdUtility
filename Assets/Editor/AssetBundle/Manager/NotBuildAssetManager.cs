@@ -6,8 +6,8 @@ namespace AssetBundle
 {
 	public class NotBuildAssetManager : BaseAssetManager{
 
-        public NotBuildAssetManager(string srcFolder, string filter, string outputFolder)
-            : base(srcFolder, filter, outputFolder) {
+        public NotBuildAssetManager(string assetFolderPath, string filter, string outputFolderName)
+            : base(assetFolderPath, filter, outputFolderName) {
 
         }
 
@@ -16,16 +16,16 @@ namespace AssetBundle
             BaseAsset[] items = new BaseAsset[assetPaths.Length];
 
             for (int i = 0; i < assetPaths.Length; i++) {
-                items[i] = new NotBuildAsset(assetPaths[i], base.outputFolder, base.srcFolder);
+                items[i] = new NotBuildAsset(assetPaths[i], base.assetFolderPath, base.outputFolderName);
             }
 
             return items;
         }
 
-        public void Build(string productFolder) {
-            for (int i = 0; i < base.items.Length; i++) {
+        public void Build(string folder) {
+            for (int i = 0, j = base.items.Length; i < j; i++) {
                 NotBuildAsset item = (NotBuildAsset)base.items[i];
-                item.Build(productFolder);
+                item.Build(folder);
             }
         }
     }

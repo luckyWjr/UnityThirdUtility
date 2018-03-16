@@ -27,7 +27,7 @@ namespace AssetBundle {
 
             tarFolder = FixPath(tarFolder).TrimEnd('/');
 
-            string srcFolder = BuildConfig.buildingProductsFolder;
+            string srcFolder = BuildConfig.buildingAssetBundlesFolder;
 
             // 先删除目标文件夹里的包
             string[] srcSubFolders = Directory.GetDirectories(srcFolder, "*", SearchOption.AllDirectories);

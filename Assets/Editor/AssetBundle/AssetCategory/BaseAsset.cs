@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
+using Utility;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,46 +18,73 @@ namespace AssetBundle {
     /// </summary>
     public abstract class BaseAsset {
         
-        string m_outputFolderPath;
-        string m_currentHash;
+        /// <summary>
+        /// AB输出文件夹名称 如a/b
+        /// </summary>
+        string m_outputFolderName;
 
-        protected abstract string ComputeHash();
+        string m_currentMd5;
+
+        //存放临时变量
+        int m_i, m_len;
+        string m_tempString;
+
+        protected abstract string ComputeMd5();
 
         AssetFlag m_flag = AssetFlag.NoChange;
-        
+
+        public BaseAsset(string outputFolderName) {
+            if(string.IsNullOrEmpty(outputFolderName)) {
+                throw new ArgumentException("outputFolder");
+            }
+
+            m_outputFolderName = outputFolderName.TrimStart('/').TrimEnd('/');
+            m_outputFolderName = m_outputFolderName.ToLower();
+        }
+
         #region 属性
 
-        public string outputRelativePath {
-            get {
-                string path = m_outputFolderPath.Contains("{0}") ? string.Format(m_outputFolderPath, name) : string.Format("{0}/{1}", m_outputFolderPath, name);
-                return path.ToLower();
-            }
-        }
+        /// <summary>
+        /// 资源文件名 不带扩展名
+        /// </summary>
+        public abstract string name { get; }
 
         /// <summary>
-        /// AB 的包名
+        /// 资源文件名，带扩展名
         /// </summary>
-        public string assetBundleName {
-            get { return outputRelativePath + ext; }
-        }
-
-        public string lastHash { get; set; }
-
-        public string currentHash {
-            get {
-                if (string.IsNullOrEmpty(m_currentHash)) {
-                    m_currentHash = ComputeHash();
-                }
-                return m_currentHash;
-            }
-        }
-
         public string fullName {
             get { return name + ext; }
         }
 
+        /// <summary>
+        /// AB 的包名 如：a/b/c.d
+        /// </summary>
+        public string assetBundleName {
+            get {
+                string path = m_outputFolderName.Contains("{0}") ? string.Format(m_outputFolderName, fullName) : string.Format("{0}/{1}", m_outputFolderName, fullName);
+                return path.ToLower();
+            }
+        }
+
+        public string outputFolderName {
+            get {
+                return m_outputFolderName;
+            }
+        }
+
+        public string lastMd5;
+
+        public string currentMd5 {
+            get {
+                if(string.IsNullOrEmpty(m_currentMd5)) {
+                    m_currentMd5 = ComputeMd5();
+                }
+                return m_currentMd5;
+            }
+        }
+
         public bool isNeedBuild {
-            get { return currentHash != lastHash; }
+            get { return currentMd5 != lastMd5; }
         }
 
         public virtual string ext {
@@ -73,20 +100,11 @@ namespace AssetBundle {
             }
         }
 
-        public abstract string name { get; }
-
         /// <summary>
         /// AB里面资源的名称（即路径）
         /// </summary>
         public abstract string[] assetNames { get; }
         #endregion
-
-        #region static
-
-        static MD5 m_md5;
-        static MD5 md5 {
-            get { return m_md5 ?? (m_md5 = MD5.Create()); }
-        }
 
         public static void ParseConfigLine(string configLine, out string relativePath, out string hash) {
             string[] words = configLine.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -95,31 +113,12 @@ namespace AssetBundle {
         }
 
         /// <summary>
-        /// asset path 转 full path
+        /// 获取Asset和.meta文件的btye[]
         /// </summary>
-        public static string GetFullPath(string assetPath) {
-            if (string.IsNullOrEmpty(assetPath)) {
-                return "";
-            }
-
-            string p = Application.dataPath + assetPath.Substring(6);
-            return p.Replace("\\", "/");
-        }
-
-        /// <summary>
-        /// full path 转 asset path
-        /// </summary>
-        public static string GetAssetPath(string fullPath) {
-            if (string.IsNullOrEmpty(fullPath)) {
-                return "";
-            }
-
-            fullPath = fullPath.Replace("\\", "/");
-            return fullPath.StartsWith("Assets/") ?  fullPath : "Assets" + fullPath.Substring(Application.dataPath.Length);
-        }
-
-        public static byte[] ReadAssetBytes(string assetPath) {
-            string fullPath = GetFullPath(assetPath);
+        /// <param name="assetPath">Asset路径</param>
+        /// <returns>Asset和.meta文件的btye[]</returns>
+        public byte[] ReadAssetBytes(string assetPath) {
+            string fullPath = PathUtility.GetFullPath(assetPath);
             if (!File.Exists(fullPath)) {
                 return null;
             }
@@ -137,58 +136,17 @@ namespace AssetBundle {
         }
 
         /// <summary>
-        /// 计算哈希值字符串
+        /// 计算单个资源的md5码
         /// </summary>
-        public static string ComputeHash(byte[] buffer) {
-            if (buffer == null || buffer.Length < 1) {
-                return "";
-            }
-
-            byte[] hash = md5.ComputeHash(buffer);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var b in hash) {
-                sb.Append(b.ToString("x2"));
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// 计算单个资源的哈希码
-        /// </summary>
-        public static string ComputeHash(string assetPath) {
+        public string ComputeMd5(string assetPath) {
             byte[] buffer = ReadAssetBytes(assetPath);
-            return buffer != null ? ComputeHash(buffer) : null;
+            return buffer != null ? TypeConvertUtility.ByteToMd5(buffer) : null;
         }
 
         /// <summary>
-        /// 计算单个文件联合依赖项的哈希码
+        /// 计算若干个文件合并成的md5码
         /// </summary>
-        public static string ComputeHashWithDependencies(string assetPath) {
-            byte[] buffer = ReadAssetBytes(assetPath);
-            if (buffer == null) {
-                return "";
-            }
-
-            List<byte> list = new List<byte>(buffer);
-
-            // 依赖项
-            string[] dependencies = AssetDatabase.GetDependencies(new string[] { assetPath });
-            foreach (var d in dependencies) {
-                byte[] bufferOfD = ReadAssetBytes(d);
-                if (bufferOfD != null) {
-                    list.AddRange(bufferOfD);
-                }
-            }
-
-            return ComputeHash(list.ToArray());
-        }
-
-        /// <summary>
-        /// 计算若干个文件合并成的哈希码
-        /// </summary>
-        public static string ComputeHashWithDependencies(string[] assetPaths) {
+        public string ComputeMd5WithDependencies(string[] assetPaths) {
             List<byte> list = new List<byte>();
             foreach (var p in assetPaths) {
                 byte[] buffer = ReadAssetBytes(p);
@@ -199,29 +157,24 @@ namespace AssetBundle {
 
             // 依赖项
             string[] dependencies = AssetDatabase.GetDependencies(assetPaths);
-            foreach (var d in dependencies) {
-                byte[] bufferOfD = ReadAssetBytes(d);
-                if (bufferOfD != null) {
+            byte[] bufferOfD;
+            foreach(var d in dependencies) {
+                bufferOfD = null;
+                bufferOfD = ReadAssetBytes(d);
+                if(bufferOfD != null) {
                     list.AddRange(bufferOfD);
                 }
             }
 
-            return ComputeHash(list.ToArray());
+            return TypeConvertUtility.ByteToMd5(list.ToArray());
         }
 
-        #endregion
-
-        public BaseAsset(string outputFolder) {
-            if (string.IsNullOrEmpty(outputFolder)) {
-                throw new ArgumentException("outputFolder");
-            }
-
-            m_outputFolderPath = outputFolder.TrimStart('/').TrimEnd('/');
-        }
-
-        public void ComputeHashIfNeeded() {
-            if (string.IsNullOrEmpty(m_currentHash)) {
-                m_currentHash = ComputeHash();
+        /// <summary>
+        /// 若Hash为空，则计算Hash
+        /// </summary>
+        public void ComputeMd5IfNeeded() {
+            if (string.IsNullOrEmpty(m_currentMd5)) {
+                m_currentMd5 = ComputeMd5();
             }
         }
 
@@ -229,25 +182,26 @@ namespace AssetBundle {
         /// 生成一条配置
         /// </summary>
         public string GenerateConfigLine() {
-            return string.Format("{0}{1},{2},", outputRelativePath, ext, currentHash);
+            return string.Format("{0},{1},", assetBundleName, currentMd5);
         }
 
         /// <summary>
         /// 读取配置，从中找出属于自己的那条
         /// </summary>
-        public void ReadConfig(string[] configLines) {
-            foreach (var l in configLines) {
-                if (RightConfig(l)) {
-                    string r, m_lastHash;
-                    ParseConfigLine(l, out r, out m_lastHash);
-                    lastHash = m_lastHash;
-                    break;
+        /// <param name="configLines">配置数组</param>
+        /// <returns>对应下标，若没有返回-1</returns>
+        public int ReadConfig(List<string> configLines) {
+            for(m_i = 0, m_len = configLines.Count; m_i < m_len; m_i++) {
+                if(RightConfig(configLines[m_i])) {
+                    ParseConfigLine(configLines[m_i], out m_tempString, out lastMd5);
+                    return m_i;
                 }
             }
+            return -1;
         }
 
         public bool RightConfig(string configLine) {
-            return configLine.StartsWith(outputRelativePath + ext + ",");
+            return configLine.StartsWith(assetBundleName + ",");
         }
 
         public virtual void Dispose() {

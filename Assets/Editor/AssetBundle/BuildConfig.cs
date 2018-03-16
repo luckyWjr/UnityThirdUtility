@@ -46,7 +46,7 @@ namespace AssetBundle {
         static IEnumerable<BaseAssetManager> GetMainProjectConfig() {
             //string localizedAtlasFolder = "Assets/UI/Localize/Atlas";
             yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/Test", "t:Prefab", "Test");
-            yield return new NormalAssetManager<Texture>(m_unityBaseFolder+ "Res/Images", "t:Texture2D", "Images");
+            yield return new NormalAssetManager<Texture>(m_unityBaseFolder + "Res/Images", "t:Texture2D", "Images");
             yield return new GroupAssetManager<Sprite>(m_unityBaseFolder + "Res/Sprites", "t:Sprite", "Sprites");
             yield return new NormalAssetManager<UnityEngine.Object>(m_unityBaseFolder + "Res/UIPrefabs", "t:Prefab", "UIPrefabs");
             //yield return new NotBuildAssetManager("Assets/Config/Data", "f:*.dat", "Data");// data
@@ -240,6 +240,7 @@ namespace AssetBundle {
             }
         }
 
+        #region 存放完整的AB资源
         public static string buildingRootFolder {
             get {
                 string folder = Application.dataPath.Substring(0, Application.dataPath.Length - 7);
@@ -248,8 +249,8 @@ namespace AssetBundle {
             }
         }
 
-        public static string buildingProductsFolder {
-            get { return buildingRootFolder + "/Products"; }
+        public static string buildingAssetBundlesFolder {
+            get { return buildingRootFolder + "/StreamingAssets"; }
         }
 
         public static string buildingVersionPath {
@@ -267,16 +268,16 @@ namespace AssetBundle {
         public static string loadingVersionPath {
             get {
                 string name = GetLoadingVersionName(currentProject);
-                return string.Format("{0}/{1}", buildingProductsFolder, name);
+                return string.Format("{0}/{1}", buildingAssetBundlesFolder, name);
             }
         }
 
         public static string loadingListPath {
-            get { return string.Format("{0}/{1}", buildingProductsFolder, GetLoadingListName(currentProject)); }
+            get { return string.Format("{0}/{1}", buildingAssetBundlesFolder, GetLoadingListName(currentProject)); }
         }
+        #endregion
 
-#region temp
-
+        #region temp 用于存放差异包
         public static string tempBuildingRootFolder {
             get {
                 string folder = Application.dataPath.Substring(0, Application.dataPath.Length - 7);
@@ -285,8 +286,8 @@ namespace AssetBundle {
             }
         }
 
-        public static string tempBuildingProductsFolder {
-            get { return tempBuildingRootFolder + "/Products"; }
+        public static string tempbuildingAssetBundlesFolder {
+            get { return tempBuildingRootFolder + "/StreamingAssets"; }
         }
 
         public static string tempBuildingVersionPath {
@@ -304,12 +305,12 @@ namespace AssetBundle {
         public static string tempLoadingVersionPath {
             get {
                 string name = GetLoadingVersionName(currentProject);
-                return string.Format("{0}/{1}", tempBuildingProductsFolder, name);
+                return string.Format("{0}/{1}", tempbuildingAssetBundlesFolder, name);
             }
         }
 
         public static string tempLoadingListPath {
-            get { return string.Format("{0}/{1}", tempBuildingProductsFolder, GetLoadingListName(currentProject)); }
+            get { return string.Format("{0}/{1}", tempbuildingAssetBundlesFolder, GetLoadingListName(currentProject)); }
         }
 
 #endregion

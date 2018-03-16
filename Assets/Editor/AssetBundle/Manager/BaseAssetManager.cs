@@ -1,25 +1,48 @@
 ﻿using System;
 using System.IO;
 using UnityEditor;
-using UnityEngine;
+using Utility;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace AssetBundle {
 	public abstract class BaseAssetManager {
 
-        string m_outputFolder;
+        string m_outputFolderName;
         BaseAsset[] m_items;
+
+        bool m_isChange = false;//记录该目录下的资源包是否发生变化
+        bool m_isCompare = false;//是否对比过上个版本的资源
 
         protected abstract BaseAsset[] GetAssetArray();
 
-        #region static
+        /// <summary>
+        /// 资源类别，如lua是一个类别，ui prefab是一个类别
+        /// </summary>
+        /// <param name="assetFolderPath">资源所在项目目录 如：Assets/Res/Textures</param>
+        /// <param name="filter">过滤器，其中如f:*.*是自定义的过滤器，做为SearchPattern搜索匹配文件</param>
+        /// <param name="outputFolderName">此资源输出的文件夹名 如Textures</param>
+        public BaseAssetManager(string assetFolderPath, string filter, string outputFolderName) {
+            if(string.IsNullOrEmpty(assetFolderPath) || !assetFolderPath.StartsWith(BuildConfig.unityBaseFolder)) {
+                throw new ArgumentException("assetFolderPath");
+            }
+            if(string.IsNullOrEmpty(filter)) {
+                throw new ArgumentException("filter");
+            }
+            if(string.IsNullOrEmpty(outputFolderName)) {
+                throw new ArgumentException("outputFolder");
+            }
+
+            this.assetFolderPath = assetFolderPath;
+            this.filter = filter;
+            this.outputFolderName = outputFolderName;
+        }
 
         /// <summary>
         /// 获取指定目录的资源
         /// </summary>
         /// <param name="filter">过滤器，若以t:开头，表示用unity的方式过滤；若以f:开头，表示用windows的SearchPattern方式过滤；若以r:开头，表示用正则表达式的方式过滤。</param>
-        public static string[] GetAssets(string folder, string filter) {
+        public string[] GetAssets(string folder, string filter) {
             if (string.IsNullOrEmpty(folder)) {
                 throw new ArgumentException("folder");
             }
@@ -35,23 +58,23 @@ namespace AssetBundle {
                 }
                 return paths;
             } else if (filter.StartsWith("f:")) {
-                string folderFullPath = BaseAsset.GetFullPath(folder);
+                string folderFullPath = PathUtility.GetFullPath(folder);
                 string searchPattern = filter.Substring(2);
                 string[] files = Directory.GetFiles(folderFullPath, searchPattern, SearchOption.AllDirectories);
                 string[] paths = new string[files.Length];
                 for (int i = 0; i < files.Length; i++) {
-                    paths[i] = BaseAsset.GetAssetPath(files[i]);
+                    paths[i] = PathUtility.GetAssetPath(files[i]);
                 }
                 return paths;
             } else if (filter.StartsWith("r:")) {
-                string folderFullPath = BaseAsset.GetFullPath(folder);
+                string folderFullPath = PathUtility.GetFullPath(folder);
                 string pattern = filter.Substring(2);
                 string[] files = Directory.GetFiles(folderFullPath, "*.*", SearchOption.AllDirectories);
                 List<string> list = new List<string>();
                 for (int i = 0; i < files.Length; i++) {
                     string name = Path.GetFileName(files[i]);
                     if (Regex.IsMatch(name, pattern)) {
-                        string p = BaseAsset.GetAssetPath(files[i]);
+                        string p = PathUtility.GetAssetPath(files[i]);
                         list.Add(p);
                     }
                 }
@@ -61,42 +84,25 @@ namespace AssetBundle {
             }
         }
 
-        #endregion
+        /// <summary>
+        /// 计算所有资源各自的md5
+        /// </summary>
+        public virtual void ComputeMd5() {
+            foreach (var item in items) {
+                item.ComputeMd5IfNeeded();
+            }
+        }
 
         /// <summary>
-        /// 资源类别，如lua是一个类别，ui prefab是一个类别
+        /// 获取该种类所有需要打包资源
         /// </summary>
-        /// <param name="srcFolder">资源所在项目目录</param>
-        /// <param name="filter">过滤器，其中如f:*.*是自定义的过滤器，做为SearchPattern搜索匹配文件</param>
-        /// <param name="outputFolder">此资源输出的目录</param>
-        public BaseAssetManager(string srcFolder, string filter, string outputFolder) {
-            if (string.IsNullOrEmpty(srcFolder) || !srcFolder.StartsWith(BuildConfig.unityBaseFolder)) {
-                throw new ArgumentException("srcFolder");
-            }
-            if (string.IsNullOrEmpty(filter)) {
-                throw new ArgumentException("filter");
-            }
-            if (string.IsNullOrEmpty(outputFolder)) {
-                throw new ArgumentException("outputFolder");
-            }
-
-            this.srcFolder = srcFolder;
-            this.filter = filter;
-            this.outputFolder = outputFolder;
-        }
-
-        public virtual void ComputeHash() {
-            foreach (var item in items) {
-                item.ComputeHashIfNeeded();
-            }
-        }
-
+        /// <returns>资源路径数组</returns>
         protected string[] GetAssets() {
-            return GetAssets(srcFolder, filter);
+            return GetAssets(assetFolderPath, filter);
         }
 
         public override string ToString() {
-            return string.Format("{0}\t{1}\t{2}", srcFolder, filter, outputFolder);
+            return string.Format("{0}\t{1}\t{2}", assetFolderPath, filter, m_outputFolderName);
         }
 
         public virtual void Dispose() {
@@ -114,7 +120,7 @@ namespace AssetBundle {
         }
 
         #region 属性
-        public string srcFolder {
+        public string assetFolderPath {
             private set;
             get;
         }
@@ -124,9 +130,9 @@ namespace AssetBundle {
             get;
         }
 
-        public string outputFolder {
-            get { return m_outputFolder; }
-            set { m_outputFolder = value.TrimStart('/').TrimEnd('/').ToLower(); }
+        public string outputFolderName {
+            get { return m_outputFolderName; }
+            set { m_outputFolderName = value.TrimStart('/').TrimEnd('/').ToLower(); }
         }
 
         public BaseAsset[] items {
@@ -138,17 +144,25 @@ namespace AssetBundle {
             }
         }
 
+        /// <summary>
+        /// 判断是否有资源更新，若m_isCompare == false则一个个资源对比md5
+        /// </summary>
         public bool isChange {
             get {
-                if (items != null) {
-                    foreach (var item in items) {
-                        if (item.lastHash != item.currentHash) {
-                            return true;
+                if(m_isCompare == false) {
+                    if(items != null) {
+                        foreach(var item in items) {
+                            if(item.lastMd5 != item.currentMd5) {
+                                m_isChange = true;
+                                m_isCompare = true;
+                                return m_isChange;
+                            }
                         }
                     }
+                    m_isChange = false;
+                    m_isCompare = true;
                 }
-
-                return false;
+                return m_isChange;
             }
         }
 

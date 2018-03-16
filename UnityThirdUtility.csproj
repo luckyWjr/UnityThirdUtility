@@ -232,6 +232,8 @@
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\SpriteAssetItem.cs" />
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\Asset\UIPrefabAssetItem.cs" />
     <Compile Include="Assets\Scripts\Utilities\AssetBundle\AssetBundleUtility.cs" />
+    <Compile Include="Assets\Scripts\Utilities\PathUtility.cs" />
+    <Compile Include="Assets\Scripts\Utilities\TypeConvertUtility.cs" />
     <Compile Include="Assets\Scripts\Utilities\WebUtility.cs" />
     <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Scripts\NavMeshLink.cs" />
     <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Scripts\NavMeshModifier.cs" />

@@ -11,7 +11,7 @@ namespace Utility {
 	public class AssetBundleUtility {
 
         //public static readonly string suffix = ".assetbundle";
-        public static readonly string streamingAssetsFileName = "Products";
+        public static readonly string streamingAssetsFileName = "StreamingAssets";
 
         static AssetBundleManifest m_mainfest;
         static AssetBundleManifest mainfest {
@@ -20,6 +20,9 @@ namespace Utility {
                     AssetBundle ab = AssetBundle.LoadFromFile(streamingAssetsPath + "/" + streamingAssetsFileName);
                     if(ab != null) {
                         m_mainfest = (AssetBundleManifest)ab.LoadAsset("AssetBundleManifest");
+
+                        ab.Unload(false);
+                        ab = null;
                     } else {
                         Debug.LogError("Get Mainfest Error");
                         return null;
@@ -28,9 +31,18 @@ namespace Utility {
                 return m_mainfest;
             }
         }
+        /// <summary>
+        /// 缓存使用到的AssetBundle
+        /// </summary>
+        static Dictionary<string, AssetBundleItem> cacheAssetBundleItemDic = new Dictionary<string, AssetBundleItem>();
 
-        static Dictionary<string, AssetBundleItem> cacheAssets = new Dictionary<string, AssetBundleItem>();
-
+        /// <summary>
+        /// 同步加载AB资源
+        /// </summary>
+        /// <param name="path">AB资源路径</param>
+        /// <param name="fileName">AB资源文件名</param>
+        /// <param name="isHasDependence">是否存在依赖关系</param>
+        /// <returns>AB包信息</returns>
         public static AssetBundleItem Load(string path, string fileName, bool isHasDependence = true) {
             if(mainfest != null) {
                 path = path.ToLower();
@@ -42,31 +54,40 @@ namespace Utility {
                     int len = dps.Length;
                     for(int i = 0; i < len; i++) {
                         AssetBundleItem dItem;
-                        if(cacheAssets.ContainsKey(dps[i])) {
-                            dItem = cacheAssets[dps[i]];
+                        if(cacheAssetBundleItemDic.ContainsKey(dps[i])) {
+                            dItem = cacheAssetBundleItemDic[dps[i]];
                         } else {
                             dItem = new AssetBundleItem(dps[i], fileName, false);
-                            dItem.asset = AssetBundle.LoadFromFile(dItem.pathName);
-                            cacheAssets[dps[i]] = dItem;
+                            dItem.assetBundle = AssetBundle.LoadFromFile(dItem.pathName);
+                            cacheAssetBundleItemDic.Add(dps[i], dItem);
                         }
+                        Debug.Log("wjr---ABLoad---Dependence---" + dps[i]);
                         dItem.refCount++;
                     }
                 }
                 
                 AssetBundleItem ab;
-                if(cacheAssets.ContainsKey(path)) {
-                    ab = cacheAssets[path];
+                if(cacheAssetBundleItemDic.ContainsKey(path)) {
+                    ab = cacheAssetBundleItemDic[path];
                 } else {
                     ab = new AssetBundleItem(path, fileName, isHasDependence);
-                    ab.asset = AssetBundle.LoadFromFile(ab.pathName);
-                    cacheAssets[path] = ab;
+                    ab.assetBundle = AssetBundle.LoadFromFile(ab.pathName);
+                    cacheAssetBundleItemDic.Add(path, ab);
                 }
+                Debug.Log("wjr---ABLoad---" + path);
                 ab.refCount++;
                 return ab;
             }
             return null;
         }
 
+        /// <summary>
+        /// 异步加载AB资源
+        /// </summary>
+        /// <param name="path">AB资源路径</param>
+        /// <param name="fileName">AB资源文件名</param>
+        /// <param name="isHasDependence">是否存在依赖关系</param>
+        /// <returns>AB包信息</returns>
         public static IEnumerator LoadAsync(string path, string fileName, System.Action<AssetBundleItem> callback, bool isHasDependence = true) {
             if(mainfest != null) {
                 path = path.ToLower();
@@ -78,29 +99,31 @@ namespace Utility {
                     int len = dps.Length;
                     for(int i = 0; i < len; i++) {
                         AssetBundleItem dItem;
-                        if(cacheAssets.ContainsKey(dps[i])) {
-                            dItem = cacheAssets[dps[i]];
+                        if(cacheAssetBundleItemDic.ContainsKey(dps[i])) {
+                            dItem = cacheAssetBundleItemDic[dps[i]];
                         } else {
                             dItem = new AssetBundleItem(dps[i], fileName, false);
                             AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(dItem.pathName);
                             yield return request;
-                            dItem.asset = request.assetBundle;
-                            cacheAssets[dps[i]] = dItem;
+                            dItem.assetBundle = request.assetBundle;
+                            cacheAssetBundleItemDic[dps[i]] = dItem;
                         }
+                        Debug.Log("wjr---ABLoadAsync---Dependence---" + dps[i]);
                         dItem.refCount++;
                     }
                 }
 
                 AssetBundleItem ab;
-                if(cacheAssets.ContainsKey(path)) {
-                    ab = cacheAssets[path];
+                if(cacheAssetBundleItemDic.ContainsKey(path)) {
+                    ab = cacheAssetBundleItemDic[path];
                 } else {
                     ab = new AssetBundleItem(path, fileName, isHasDependence);
                     AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(ab.pathName);
                     yield return request;
-                    ab.asset = request.assetBundle;
-                    cacheAssets[path] = ab;
+                    ab.assetBundle = request.assetBundle;
+                    cacheAssetBundleItemDic[path] = ab;
                 }
+                Debug.Log("wjr---ABLoadAsync---" + path);
                 ab.refCount++;
                 if(callback != null) {
                     callback(ab);
@@ -108,15 +131,14 @@ namespace Utility {
             }
         }
 
+        /// <summary>
+        /// AB的引用-1，若为0则删除该AB
+        /// </summary>
+        /// <param name="path"></param>
         public static void Delete(string path) {
             path = path.ToLower();
-            if(cacheAssets.ContainsKey(path)) {
-                AssetBundleItem ab = cacheAssets[path];
-                ab.refCount--;
-                if(ab.refCount <= 0) {
-                    ab.asset.Unload(true);
-                    cacheAssets.Remove(path);
-                }
+            if(cacheAssetBundleItemDic.ContainsKey(path)) {
+                AssetBundleItem ab = cacheAssetBundleItemDic[path];
 
                 if(ab.isHasDependence) {
                     //删除依赖
@@ -124,6 +146,14 @@ namespace Utility {
                     for(int i = 0, len = dps.Length; i < len; i++) {
                         Delete(dps[i]);
                     }
+                }
+
+                ab.refCount--;
+                if(ab.refCount <= 0) {
+                    Debug.Log("wjr---ABDelete---" + ab.pathName);
+                    ab.assetBundle.Unload(true);
+                    ab = null;
+                    cacheAssetBundleItemDic.Remove(path);
                 }
             }
         }
@@ -183,14 +213,14 @@ namespace Utility {
     public class AssetBundleItem {
         public string pathName;
         public string fileName;
-        public AssetBundle asset;
+        public AssetBundle assetBundle;
         public int refCount;
         public bool isHasDependence;
 
         public AssetBundleItem(string path, string file, bool isHasDependence) {
             pathName = AssetBundleUtility.GetAssetPath(path);
             fileName = file;
-            asset = null;
+            assetBundle = null;
             refCount = 0;
             this.isHasDependence = isHasDependence;
         }
@@ -200,8 +230,8 @@ namespace Utility {
         }
 
         public Object LoadAsset(string name, System.Type type) {
-            if(asset != null) {
-                return asset.LoadAsset(name, type);
+            if(assetBundle != null) {
+                return assetBundle.LoadAsset(name, type);
             }
             return null;
         }

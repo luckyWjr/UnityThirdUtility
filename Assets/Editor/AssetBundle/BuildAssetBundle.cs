@@ -155,7 +155,7 @@ namespace AssetBundle {
                 count++;
 
                 string ftpRelativePath = "AssetBundle/" + BuildConfig.platformFolderName;
-                string srcFolder = BuildSetting.instance.isFtpUploadAll ? BuildConfig.buildingProductsFolder : BuildConfig.tempBuildingProductsFolder;
+                string srcFolder = BuildSetting.instance.isFtpUploadAll ? BuildConfig.buildingAssetBundlesFolder : BuildConfig.tempbuildingAssetBundlesFolder;
                 Uploader.UploadToFtp(BuildSetting.instance.ftpUri, srcFolder, ftpRelativePath, BuildSetting.instance.ftpUserName, BuildSetting.instance.ftpPassword, BuildSetting.instance.isFtpPassive);
                 yield return "已使用控制台程序上传ftp...";
             }

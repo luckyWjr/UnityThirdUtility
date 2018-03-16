@@ -35,6 +35,7 @@ namespace Utility {
         public void Destroy() {
             if(assetBundleItem != null) {
                 AssetBundleUtility.Delete(m_fullPath);
+                assetBundleItem = null;
             }
         }
     }

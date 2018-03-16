@@ -290,6 +290,7 @@
     <Compile Include="Assets\Editor\AssetBundle\Manager\NotBuildAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Manager\TextAssetManager.cs" />
     <Compile Include="Assets\Editor\AssetBundle\Uploader.cs" />
+    <Compile Include="Assets\Editor\BuildAssetBundle.cs" />
     <Compile Include="Assets\Editor\SpritePacker\CustomPackerPolicy.cs" />
     <Compile Include="Assets\Editor\UnityBuildHandle.cs" />
     <Compile Include="Assets\ThirdUtilities\NavMeshComponents\Editor\NavMeshComponentsGUIUtility.cs" />
